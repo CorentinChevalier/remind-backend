@@ -1,0 +1,33 @@
+version: '3.8'
+services:
+    database:
+        env_file:
+            - .env
+        image: postgres:latest
+        container_name: remind-sql-database
+        restart: on-failure
+        environment:
+            POSTGRES_USER: ${POSTGRES_USER}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+            POSTGRES_DB: ${POSTGRES_DB}
+        volumes:
+            - local-postgres-data:/var/lib/postgresql/data
+        ports:
+            - '${POSTGRES_PORT}:5432'
+    pg_admin:
+        env_file:
+            - .env
+        image: dpage/pgadmin4
+        container_name: remind-pgadmin
+        restart: on-failure
+        environment:
+            PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+            PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+        volumes:
+            - local-pgadmin-data:/var/lib/pgadmin
+        ports:
+            - '${PGADMIN_PORT}:80'
+
+volumes:
+    local-postgres-data:
+    local-pgadmin-data:
