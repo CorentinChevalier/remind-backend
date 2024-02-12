@@ -5,3 +5,7 @@ export class Settings {
 	@PrimaryGeneratedColumn('uuid')
 	id: string
 }
+
+export interface SettingsInterface {
+	id: string
+}

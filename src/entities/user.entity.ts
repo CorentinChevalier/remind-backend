@@ -6,8 +6,8 @@ import {
 	OneToOne,
 	PrimaryGeneratedColumn,
 } from 'typeorm'
-import { Note } from './note.entity'
-import { Settings } from './settings.entity'
+import { Note, NoteInterface } from './note.entity'
+import { Settings, SettingsInterface } from './settings.entity'
 
 @Entity()
 export class User {
@@ -35,4 +35,15 @@ export class User {
 	@OneToOne(() => Settings)
 	@JoinColumn()
 	settings: Settings
+}
+
+export interface UserInterface {
+	id: string
+	username: string
+	firstname: string
+	lastname: string
+	email: string
+	password: string
+	notes: NoteInterface[]
+	settings: SettingsInterface
 }

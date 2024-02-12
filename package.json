@@ -17,6 +17,7 @@
 	"author": "Corentin Chevalier",
 	"license": "ISC",
 	"dependencies": {
+		"argon2": "^0.31.2",
 		"express": "^4.18.2",
 		"helmet": "^7.1.0",
 		"pg": "^8.11.3",

@@ -15,3 +15,10 @@ export class Note {
 	@Column({ type: 'text', nullable: true })
 	content: string
 }
+
+export interface NoteInterface {
+	id: string
+	user: User
+	title: string
+	content: string
+}
