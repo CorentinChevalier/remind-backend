@@ -1,13 +1,15 @@
 import { database } from '../../app-data-source'
 import { User } from '../../entities/user.entity'
-import { CustomErrorCodes, ErrorCodes } from '../../utils/errors.utils'
+import {
+	CustomErrorCodes,
+	ErrorCodes,
+	handleErrorType,
+} from '../../utils/errors.utils'
 import { SignupFormdata, hashPassword } from '../auth/auth.utils'
 
 const userRepository = database.getRepository(User)
 
-export const createUser = async (
-	formdata: SignupFormdata
-): Promise<boolean> => {
+export async function createUser(formdata: SignupFormdata): Promise<boolean> {
 	try {
 		//hashing password
 		const hashedPassword = await hashPassword(formdata.password)
@@ -24,9 +26,10 @@ export const createUser = async (
 		if (user) {
 			return true
 		} else {
-			return false
+			throw new CustomErrorCodes(ErrorCodes.SIGNUP_USER_CREATION_FAILED)
 		}
 	} catch (error) {
-		throw new CustomErrorCodes(ErrorCodes.SIGNUP_USER_CREATION_FAILED)
+		handleErrorType(error)
+		return false
 	}
 }

@@ -1,11 +1,23 @@
 import { database } from '../../app-data-source'
 import { User } from '../../entities/user.entity'
-import { CustomErrorCodes, ErrorCodes } from '../../utils/errors.utils'
-import { SignupFormdata } from './auth.utils'
+import {
+	CustomErrorCodes,
+	ErrorCodes,
+	handleErrorType,
+} from '../../utils/errors.utils'
+import { emailFormat } from '../../utils/regex.utils'
+import {
+	SigninFormdata,
+	SignupFormdata,
+	signJwt,
+	verifyPassword,
+} from './auth.utils'
 
 const userRepository = database.getRepository(User)
 
-export const verifyUserSignupFormdata = async (body: SignupFormdata) => {
+export async function verifyUserSignupFormdata(
+	body: SignupFormdata
+): Promise<boolean> {
 	try {
 		const {
 			email,
@@ -47,10 +59,64 @@ export const verifyUserSignupFormdata = async (body: SignupFormdata) => {
 
 		return true
 	} catch (error) {
-		if (error instanceof CustomErrorCodes) {
-			throw new CustomErrorCodes(error.code)
+		handleErrorType(error)
+		return false
+	}
+}
+
+export async function verifySigninFormdata(
+	body: SigninFormdata
+): Promise<boolean> {
+	try {
+		const { email, password } = body
+
+		//checking for missing fields
+		if (!email || !password) {
+			throw new CustomErrorCodes(ErrorCodes.SIGNIN_MISSING_FIELDS)
+		}
+
+		const user = await userRepository.findOneBy({ email })
+
+		//checking for valid email format
+		if (!emailFormat.test(email)) {
+			throw new CustomErrorCodes(ErrorCodes.SIGNIN_INVALID_EMAIL)
+		}
+
+		//checking for valid email
+		if (!user) {
+			throw new CustomErrorCodes(ErrorCodes.SIGNIN_INVALID_EMAIL)
+		}
+
+		//checking for valid password
+		if (!(await verifyPassword(password, user.password))) {
+			throw new CustomErrorCodes(ErrorCodes.SIGNIN_INVALID_PASSWORD)
+		}
+
+		return true
+	} catch (error) {
+		handleErrorType(error)
+		return false
+	}
+}
+
+export async function createToken(
+	body: SigninFormdata
+): Promise<string | undefined> {
+	try {
+		const user = await userRepository.findOneBy({ email: body.email })
+
+		if (user) {
+			return signJwt({
+				user: {
+					email: user.email,
+					username: user.username,
+					settings: user.settings,
+				},
+			})
 		} else {
 			throw new CustomErrorCodes(ErrorCodes.UNKNOWN_ERROR)
 		}
+	} catch (error) {
+		handleErrorType(error)
 	}
 }
