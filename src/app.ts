@@ -4,6 +4,9 @@ import 'dotenv/config'
 import 'reflect-metadata'
 import { database } from './app-data-source'
 import authController from './routes/auth/auth.controller'
+import swaggerUi from 'swagger-ui-express'
+import swaggerJsdoc from 'swagger-jsdoc'
+import options from './swaggerConfig'
 
 //setting up connection to the database
 database
@@ -29,6 +32,14 @@ app.use(helmet())
 
 //required to parse requests bodies
 app.use(express.json())
+
+//swagger
+const specs = swaggerJsdoc(options)
+app.use(
+	'/api-docs',
+	swaggerUi.serve,
+	swaggerUi.setup(specs, { explorer: true })
+)
 
 //controllers
 app.use('/auth', authController)
