@@ -1,4 +1,5 @@
 import express from 'express'
+import cors from 'cors'
 import helmet from 'helmet'
 import 'dotenv/config'
 import 'reflect-metadata'
@@ -7,6 +8,7 @@ import authController from './routes/auth/auth.controller'
 import swaggerUi from 'swagger-ui-express'
 import swaggerJsdoc from 'swagger-jsdoc'
 import options from './swaggerConfig'
+import { clientErrorHandler } from './utils/errors.utils'
 
 //setting up connection to the database
 database
@@ -29,6 +31,7 @@ const app = express()
 
 //!keep this up to date for security reasons
 app.use(helmet())
+app.use(cors())
 
 //required to parse requests bodies
 app.use(express.json())
@@ -43,6 +46,9 @@ app.use(
 
 //controllers
 app.use('/auth', authController)
+
+//errors handler
+app.use(clientErrorHandler)
 
 //start the server
 app.listen(process.env.PORT, () => {

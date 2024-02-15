@@ -1,6 +1,5 @@
 import argon2 from 'argon2'
 import 'dotenv/config'
-import { CustomErrorCodes, ErrorCodes } from '../../utils/errors.utils'
 import jwt, { JwtPayload } from 'jsonwebtoken'
 import { SettingsInterface } from '../../entities/settings.entity'
 
@@ -32,7 +31,7 @@ export async function hashPassword(password: string): Promise<string> {
 			secret: Buffer.from(process.env.HASH_PASSWORD_SECRET as string),
 		})
 	} catch (error) {
-		throw new CustomErrorCodes(ErrorCodes.PASSWORD_HASH_ERROR)
+		throw { status: 500, code: 'hash_password_error' }
 	}
 }
 
@@ -45,7 +44,7 @@ export async function verifyPassword(
 			secret: Buffer.from(process.env.HASH_PASSWORD_SECRET as string),
 		})
 	} catch (error) {
-		throw new CustomErrorCodes(ErrorCodes.PASSWORD_VERIFY_HASH_ERROR)
+		throw { status: 500, code: 'verify_password_error' }
 	}
 }
 
@@ -55,7 +54,7 @@ export function signJwt(payload: JwtPayload): string | undefined {
 			expiresIn: process.env.JWT_EXPIRATION as string,
 		})
 	} catch (error) {
-		throw new CustomErrorCodes(ErrorCodes.JWT_SIGN_ERROR)
+		throw { status: 500, code: 'sign_jwt_error' }
 	}
 }
 
@@ -63,6 +62,6 @@ export function decodeJwt(token: string): string | JwtPayload | undefined {
 	try {
 		return jwt.verify(token, process.env.JWT_SECRET as string)
 	} catch (error) {
-		throw new CustomErrorCodes(ErrorCodes.JWT_DECODE_ERROR)
+		throw { status: 500, code: 'decode_jwt_error' }
 	}
 }
